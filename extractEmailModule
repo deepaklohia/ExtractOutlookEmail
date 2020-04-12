@@ -1,0 +1,39 @@
+Private Sub btn_extractemails_Click()
+
+Dim OlApp As Object
+Dim OlMail As Object
+Dim OlItems As Object
+Dim OlFolder As Object
+Dim j As Integer
+Dim strFolder As String
+
+On Error Resume Next
+Set OlApp = GetObject(, "Outlook.Application")
+
+If Err.Number = 429 Then
+    Set OlApp = CreateObject("Outlook.Application")
+End If
+
+strFolder = ThisWorkbook.Path & "\Extract" 'Change Extract to the folder name where you would like to have your attachements
+
+Set OlFolder = OlApp.getnamespace("MAPI").Folders("dblog").Folders("inbox")
+' Change Dblog to your main mailbox
+'change inbox to ur sub folder in the main mail box
+Set OlItems = OlFolder.Items
+
+For Each OlMail In OlItems
+    If OlMail.Attachments.Count > 0 Then
+        For j = 1 To OlMail.Attachments.Count
+            OlMail.Attachments.Item(j).SaveAsFile strFolder & "\" & OlMail.Attachments.Item(j).Filename
+        Next j
+    End If
+Next
+
+Set OlFolder = Nothing
+Set OlItems = Nothing
+Set OlMail = Nothing
+Set OlApp = Nothing
+
+MsgBox "Done", vbInformation
+
+End Sub
